@@ -6,6 +6,15 @@ import math
 def main():
     log_path = find_logs()
     data = parse_logs(log_path)
+    checked_logs = []
+    while not data or len(data) < 3:
+        checked_logs.append(log_path)
+        log_path = find_next_log(checked_logs)
+        if not log_path:
+            print("No valid logs found")
+            return 
+        data = parse_logs(log_path)
+
     materials_data = data[2] # Entry relating to materials is always found on line 3 of the logs file
     raw_materials_owned = materials_data["Raw"]
     encoded_materials_owned = materials_data["Encoded"]
@@ -17,6 +26,16 @@ def main():
     print(result)
     # Then we must translate result to its actual name. 
 
+
+def find_next_log(checked_logs):
+    user_profile = os.environ.get("USERPROFILE")
+    directory_path = os.path.join(user_profile, "Saved Games\Frontier Developments\Elite Dangerous")
+    all_logs = glob.glob(directory_path+"/*.log")
+    all_logs = sorted(all_logs, key=os.path.getctime, reverse=True)
+    for log in all_logs:
+        if log not in checked_logs:
+            return log
+    return None
 
 def compare(owned, needed):
     result = {}
@@ -32,7 +51,7 @@ def compare(owned, needed):
         else:
             difference = needed[material] - owned[material.lower()]
             if difference > 0:
-                # Tthis means something is missing
+                # This means we don't have enough of something.
                 result[material] = difference
             else:
                 continue
@@ -72,6 +91,7 @@ def get_needed_materials():
     try:
         with open("EDSY.txt", "r") as f:
             for line in f:
+                
                 data = json.loads(line)
                 return data
     except FileNotFoundError:
@@ -82,7 +102,7 @@ def get_needed_materials():
 def parse_logs(log_path):
     parsed_data = []
     try:
-        with open(log_path, "r") as f:
+        with open(log_path, "r", encoding='utf-8') as f:
             for line in f:
                 try:
                     data = json.loads(line)
