@@ -1,15 +1,17 @@
 "use client";
 
-import { ParsedData } from "@/src/lib/calculatorTypes.types";
+import { ParsedLogMaterials } from "@/src/lib/calculatorTypes.types";
 import { parseLog } from "@/src/lib/parseLog";
 
 type FileUploadProps = {
+    file: File | null;
     setFile: React.Dispatch<React.SetStateAction<File | null>>;
-    setParsedData: React.Dispatch<React.SetStateAction<ParsedData | null>>;
+    parsedData: ParsedLogMaterials | null;
+    setParsedData: React.Dispatch<React.SetStateAction<ParsedLogMaterials | null>>;
 };
 
 export default function FileUpload(props: FileUploadProps) {
-    function handleFileDrop(e: React.DragEvent<HTMLDivElement>) {
+    async function handleFileDrop(e: React.DragEvent<HTMLDivElement>) {
         e.preventDefault();
 
         const droppedFile = e.dataTransfer.files[0];
@@ -19,11 +21,11 @@ export default function FileUpload(props: FileUploadProps) {
         }
 
         props.setFile(droppedFile);
-        const parsedData = parseLog(droppedFile);
+        const parsedData = await parseLog(droppedFile);
         props.setParsedData(parsedData);
     }
 
-    function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
         const selectedFile = e.target.files?.[0];
 
         if (!selectedFile) {
@@ -31,21 +33,25 @@ export default function FileUpload(props: FileUploadProps) {
         }
 
         props.setFile(selectedFile);
-        const parsedData = parseLog(selectedFile);
+        const parsedData = await parseLog(selectedFile);
         props.setParsedData(parsedData);
     }
 
     return (
-        <div className="flex w-3xs h-3xs bg-white color-black"
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={handleFileDrop}
-        >
-            <label htmlFor="file-input" className="flex flex-col items-center justify-center w-full h-full cursor-pointer color-black">
-                <p>Drag and drop a file here, or click to select a file</p>
-            </label>
-            <input id="file-input" type="file" className="w-full h-full opacity-0 cursor-pointer"
-                onChange={handleFileSelect} />
+        <>
 
-        </div>
+            <div className="flex flex-col w-48 h-24 bg-white mb-2"
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={handleFileDrop}
+            >
+                <label htmlFor="file-input" className="flex flex-col items-center justify-center text-center w-full h-full min-h-0 max-h-full text-black cursor-pointer overflow-hidden">
+                    <div className="mb-3 text-3xl">📂</div>
+                    <p className="text-sm"> {props.file ? `Selected file: ${props.file.name}` : "Drag and drop a file here, or click to select a file"}</p>
+                </label>
+                <input id="file-input" type="file" className="hidden"
+                    onChange={handleFileSelect} />
+
+            </div>
+        </>
     )
 }

@@ -1,1 +1,3 @@
-export type ParsedData = Record<string, number>;
+export type ParsedLogMaterials = Record<string, MaterialQuantities>;
+
+export type MaterialQuantities = Record<string, number>;
