@@ -5,7 +5,7 @@ import { parseLog } from "@/src/lib/parseLog";
 import { ParsedLogMaterials, MaterialQuantities } from "@/src/lib/calculatorTypes.types";
 import { useEffect } from "react";
 import { parseReport } from "@/src/lib/parseReport";
-import {calculateResult} from "@/src/lib/calculateResult";
+import { calculateResult } from "@/src/lib/calculateResult";
 import ResultDisplay from "./ResultDisplay";
 
 export default function Home() {
@@ -54,11 +54,7 @@ export default function Home() {
       </div>
 
       <div className="flex flex-col flex-1 min-w-0 max-w-full border-amber-500 border-2 p-2">
-        <h1>Missing Materials</h1>
-          <ResultDisplay missingMaterials={calcResult} />
-
-
-
+        <ResultDisplay missingMaterials={calcResult} />
       </div>
 
     </main>
