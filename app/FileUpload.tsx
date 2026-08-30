@@ -2,6 +2,7 @@
 
 import { ParsedLogMaterials } from "@/src/lib/calculatorTypes.types";
 import { parseLog } from "@/src/lib/parseLog";
+import {EmptyFolderIcon, FilledFolderIcon} from "@/src/components/Icons";
 
 type FileUploadProps = {
     file: File | null;
@@ -40,13 +41,16 @@ export default function FileUpload(props: FileUploadProps) {
     return (
         <>
 
-            <div className="flex flex-col w-48 h-24 bg-white mb-2"
+            <div className="group hover:bg-gray-800 flex flex-col w-48 h-24 bg-white mb-2 rounded-md"
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={handleFileDrop}
             >
-                <label htmlFor="file-input" className="flex flex-col items-center justify-center text-center w-full h-full min-h-0 max-h-full text-black cursor-pointer overflow-hidden">
-                    <div className="mb-3 text-3xl">📂</div>
-                    <p className="text-sm"> {props.file ? `Selected file: ${props.file.name}` : "Drag and drop a file here, or click to select a file"}</p>
+                <label htmlFor="file-input" className="flex flex-col items-center justify-center text-center w-full h-full min-h-0 max-h-full text-black cursor-pointer overflow-hidden group-hover:text-gray-200">
+                    {
+                        props.file ?
+                            <FilledFolderIcon/> : <EmptyFolderIcon />
+                    }
+                    <p className="text-sm"> {props.file ? `${props.file.name}` : "Drag & drop file here, or click to select a file"}</p>
                 </label>
                 <input id="file-input" type="file" className="hidden"
                     onChange={handleFileSelect} />
