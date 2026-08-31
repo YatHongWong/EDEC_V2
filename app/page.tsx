@@ -8,6 +8,7 @@ import { parseReport } from "@/src/lib/parseReport";
 import { calculateResult } from "@/src/lib/calculateResult";
 import ResultDisplay from "./ResultDisplay";
 import HelpButtonForLog from "./HelpForLog";
+import CopyPathButton from "./CopyPathButton";
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
@@ -60,8 +61,8 @@ export default function Home() {
   }
 
   return (
-    <main className="flex flex-row w-full h-full space-x-2">
-      <div className="flex flex-col flex-1 min-w-0 max-w-full border-amber-500 border-2 p-2 rounded-md">
+    <main className="flex flex-col md:flex-row md:flex-wrap w-full h-full gap-2">
+      <div className="flex flex-col flex-1 min-w-96 max-w-full border-amber-500 border-2 p-2 rounded-md">
         <h1 className="text-2xl mb-2">Elite Dangerous Engineering Calculator</h1>
 
         <div className="flex flex-row items-center space-x-2">
@@ -69,12 +70,19 @@ export default function Home() {
 
           <HelpButtonForLog />
         </div>
-        <p className="text-sm text-gray-400 mb-2">Found in: %userprofile%\Saved Games\Frontier Developments\Elite Dangerous</p>
+
+        <div className="relative items-center space-x-1">
+          <p className="text-sm text-black mb-2 bg-blue-300 rounded-sm border-2 border-blue-600 p-1">Use the <strong>latest</strong> .log file that includes
+            <br />
+            <code className="font-mono text-xs border border-slate-500 break-all rounded-sm p-1"> {'{ "timestamp":"2026-XX-XXTXX:XX:09Z", "event":"Materials", ...'} </code></p>
+        </div>
 
         <FileUpload file={file} setFile={setFile} parsedData={parsedLog} setParsedData={setParsedLog} />
-        {
-          file && !parsedLog ? <p className="text-red-500 text-sm">Invalid file. Please upload a valid .log file containing the "Materials" event.</p> : null
-        }
+        <p className="text-sm text-gray-400">Found in: <strong>%userprofile%\Saved Games\Frontier Developments\Elite Dangerous</strong> <CopyPathButton path="%userprofile%\Saved Games\Frontier Developments\Elite Dangerous" /></p>
+
+        <p className={`text-red-500 text-sm transition-opacity duration-300 ${file && !parsedLog ? "visible opacity-100" : "invisible opacity-0"}`}>Invalid file. Please upload a valid .log file containing the "Materials" event.</p>
+
+
 
 
         <label htmlFor="retrofit-report-textarea">EDSY retrofit report: </label>
@@ -82,14 +90,15 @@ export default function Home() {
           placeholder="paste report here"
           onChange={(e) => setRetrofitReport(e.target.value)
           } />
-        {retrofitReport && !parsedReport ? <p className="text-red-500 text-sm">Invalid retrofit report format</p> : null}
 
-        <div className={`center h-6 w-full mx-auto mt-2 ${statusColor()}`}>
+        <p className={`text-red-500 text-sm transition-opacity duration-300 my-2 ${retrofitReport && !parsedReport ? "visible opacity-100" : "invisible opacity-0"}`}>Invalid retrofit report format</p>
+
+        <div className={`center h-6 w-full mx-auto ${statusColor()}`}>
           <p className="text-white text-sm text-center"> {statusText()}</p>
         </div>
       </div>
 
-      <div className="flex flex-col flex-1 min-w-0 max-w-full border-amber-500 border-2 p-2 rounded-md">
+      <div className="flex flex-col flex-1 min-w-96 max-w-full border-amber-500 border-2 p-2 rounded-md">
 
         <h1 className="text-2xl mb-2">Missing Materials</h1>
         <ResultDisplay missingMaterials={calcResult} />
