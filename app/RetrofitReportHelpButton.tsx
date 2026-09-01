@@ -1,5 +1,4 @@
 import { useState, useRef } from "react";
-import { createPortal } from "react-dom";
 import Image from "next/image";
 
 export default function RetrofitReportHelpButton() {
@@ -14,7 +13,7 @@ export default function RetrofitReportHelpButton() {
     return (
         <div>
             <button className="bg-gray-200 border-2 rounded-sm border-gray-400 px-1 text-md hover:bg-gray-300 " onClick={openDialog}> Click for more info</button>
-            <dialog ref={dialogRef} className="bg-black w-3/5 min-w-[60%] max-h-none h-full text-white backdrop:backdrop-blur-md m-auto" onClick={(e) => {
+            <dialog ref={dialogRef} className="bg-black w-200 min-w-150 max-h-none h-full text-white backdrop:backdrop-blur-md m-auto" onClick={(e) => {
                 // Close only if click targeted the dialog backdrop directly
                 if (e.target === dialogRef.current) {
                     closeDialog();
