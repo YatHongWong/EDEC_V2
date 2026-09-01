@@ -9,6 +9,8 @@ import { calculateResult } from "@/src/lib/calculateResult";
 import ResultDisplay from "./ResultDisplay";
 import HelpButtonForLog from "./HelpForLog";
 import CopyPathButton from "./CopyPathButton";
+import InfoBox from "./InfoBox";
+import RetrofitReportHelpButton from "./RetrofitReportHelpButton";
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
@@ -66,15 +68,15 @@ export default function Home() {
         <h1 className="text-2xl mb-2">Elite Dangerous Engineering Calculator</h1>
 
         <div className="flex flex-row items-center space-x-2">
-          <p>Commander .log file:</p>
+          <h2 className="text-lg">Commander Log File</h2>
 
           <HelpButtonForLog />
         </div>
 
         <div className="relative items-center space-x-1">
-          <p className="text-sm text-black mb-2 bg-blue-300 rounded-sm border-2 border-blue-600 p-1">Use the <strong>latest</strong> .log file that includes
-            <br />
-            <code className="font-mono text-xs border border-slate-500 break-all rounded-sm p-1"> {'{ "timestamp":"2026-XX-XXTXX:XX:09Z", "event":"Materials", ...'} </code></p>
+          <InfoBox content={
+            <p> Use the <strong>latest</strong> .log file that includes <br />
+              <code className="font-mono text-xs border border-slate-500 break-all rounded-sm p-1"> {'{ "timestamp":"2026-XX-XXTXX:XX:09Z", "event":"Materials", ...'} </code></p>} />
         </div>
 
         <FileUpload file={file} setFile={setFile} parsedData={parsedLog} setParsedData={setParsedLog} />
@@ -85,7 +87,19 @@ export default function Home() {
 
 
 
-        <label htmlFor="retrofit-report-textarea">EDSY retrofit report: </label>
+        <label htmlFor="retrofit-report-textarea" className="text-lg">EDSY Retrofit Report </label>
+
+        <InfoBox content=
+        
+          {<><p>
+            Use the following settings when generating the report: <br />
+            Apply blueprints up to <strong>grade 5</strong> <strong>100%</strong> <br />
+            Rolls to complete each grade <strong>1 2 3 4 5</strong> <span className="text-xs text-gray-700">(Assuming max reputation)</span>
+            
+          </p>
+
+          <RetrofitReportHelpButton /></>
+          } />
         <textarea id="retrofit-report-textarea" className="bg-gray-700 p-1 w-full h-40 rounded-md resize-none placeholder-gray-400"
           placeholder="paste report here"
           onChange={(e) => setRetrofitReport(e.target.value)

@@ -70,8 +70,8 @@ export default function FileUpload(props: FileUploadProps) {
 
 
 
-            <div className={`flex items-center justify-center fixed top-0 left-0 w-full h-full bg-gray-200/30 transition-opacity duration-500 ${showHiddenInput ? "opacity-100 backdrop-blur-md pointer-events-auto" : "opacity-0 pointer-events-none"}`} onDrop={handleFileDrop}>
-                    <h1 className="text-9xl font-thin text-center"> Drop your file here </h1>
+            <div className={`flex items-center justify-center fixed top-0 left-0 w-full h-full z-50 bg-gray-200/30 transition-opacity duration-300 ${showHiddenInput ? "opacity-100 backdrop-blur-md pointer-events-auto" : "opacity-0 pointer-events-none"}`} onDrop={handleFileDrop}>
+                    <h1 className="text-3xl font-thin text-center"> Upload File </h1>
             </div>
 
 
