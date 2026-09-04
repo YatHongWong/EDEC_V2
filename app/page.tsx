@@ -11,6 +11,8 @@ import HelpButtonForLog from "./HelpForLog";
 import CopyPathButton from "./CopyPathButton";
 import InfoBox from "./InfoBox";
 import RetrofitReportHelpButton from "./RetrofitReportHelpButton";
+import ErrorMessage from "./ErrorMessage";
+import { ParseResult } from "@/src/lib/parseTypes.types";
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
@@ -18,27 +20,35 @@ export default function Home() {
   const [parsedLog, setParsedLog] = useState<ParsedLogMaterials | null>(null);
   const [parsedReport, setParsedReport] = useState<MaterialQuantities | null>(null);
   const [calcResult, setCalcResult] = useState<MaterialQuantities | null>(null);
+  const [logErrorMessage, setLogErrorMessage] = useState<string>("");
+  const [reportErrorMessage, setReportErrorMessage] = useState<string>("");
 
   useEffect(() => {
     setRetrofitReport('{"retrofitOptions":{"rebuy_max_discount":1,"rebuy_max_bpgrade":0,"eng_max_bpgrade":5,"eng_max_bproll":1,"eng_est_rolls":[0,1.5,2,3,4.5,9],"exp_filter":"all"},"retrofits":[{"target":"(Current Build)","baseline":"(Stock Ship)","ship":"TypeX_3","steps":[{"enabled":true,"module":"Int_Powerplant_Size6_Class1","index":0,"action":"sell","discount":0},{"enabled":true,"module":"Int_Powerplant_Size6_Class5","index":0,"action":"buy","discount":0},{"enabled":true,"module":"Int_Powerplant_Size6_Class5","index":0,"action":"engineer","blueprint":"PowerPlant_Armoured","grade":1,"progress":0.8,"rolls":1},{"enabled":true,"module":"Int_Powerplant_Size6_Class5","index":0,"action":"engineer","blueprint":"PowerPlant_Armoured","grade":2,"progress":0.8,"rolls":1.5},{"enabled":true,"module":"Int_Powerplant_Size6_Class5","index":0,"action":"engineer","blueprint":"PowerPlant_Armoured","grade":3,"progress":0.8,"rolls":2.5},{"enabled":true,"module":"Int_Powerplant_Size6_Class5","index":0,"action":"engineer","blueprint":"PowerPlant_Armoured","grade":4,"progress":0.8,"rolls":3.5},{"enabled":true,"module":"Int_Powerplant_Size6_Class5","index":0,"action":"engineer","blueprint":"PowerPlant_Armoured","grade":5,"progress":1,"rolls":9},{"enabled":true,"module":"Int_Powerplant_Size6_Class5","index":0,"action":"experimental","experimental":"special_powerplant_toughened"}],"cost":12810960,"materials":{"WornShieldEmitters":1,"Carbon":4,"ShieldEmitters":4,"HighDensityComposites":2.5,"Vanadium":6.5,"ShieldingSensors":3.5,"FedProprietaryComposites":4.5,"Tungsten":9,"CompoundShielding":9,"FedCoreComposites":9,"GridResistors":5}}]}')
-    retrofitReport ? setParsedReport(parseReport(retrofitReport)) : null;
+    retrofitReport ? updateParsedReportAndMessage(retrofitReport) : null;
   }, []);
 
   useEffect(() => {
     if (retrofitReport) {
-      const parsed = parseReport(retrofitReport);
-      setParsedReport(parsed);
+      updateParsedReportAndMessage(retrofitReport);
     }
   }, [retrofitReport]);
-
 
   useEffect(() => {
     if (parsedLog && parsedReport) {
       setCalcResult(calculateResult(parsedLog, parsedReport));
     }
+  }, [parsedLog, parsedReport, logErrorMessage, reportErrorMessage]);
 
-
-  }, [parsedLog, parsedReport]);
+  function updateParsedReportAndMessage(report: string) {
+    const parseResult: ParseResult<MaterialQuantities | null> = parseReport(report);
+    if (parseResult.success) {
+      setParsedReport(parseResult.data);
+    } else {
+      setParsedReport(null);
+    }
+    setReportErrorMessage(parseResult.message);
+  }
 
   function statusColor() {
     if (parsedLog && parsedReport) {
@@ -75,37 +85,40 @@ export default function Home() {
 
         <div className="relative items-center space-x-1">
           <InfoBox content={
-            <p> Use the <strong>latest</strong> .log file that includes <br />
-              <code className="font-mono text-xs border border-slate-500 break-all rounded-sm p-1"> {'{ "timestamp":"2026-XX-XXTXX:XX:09Z", "event":"Materials", ...'} </code></p>} />
+            <>
+              <p>Found in: <strong>%userprofile%\Saved Games\Frontier Developments\Elite Dangerous</strong> <CopyPathButton path="%userprofile%\Saved Games\Frontier Developments\Elite Dangerous" /></p>
+
+              <p> Use the <strong>latest</strong> .log file that includes <br />
+                <code className="font-mono text-xs border border-slate-500 break-all rounded-sm p-1"> {'{ "timestamp":"2026-XX-XXTXX:XX:09Z", "event":"Materials", ...'} </code></p>
+
+            </>} />
+
+
         </div>
 
-        <FileUpload file={file} setFile={setFile} parsedData={parsedLog} setParsedData={setParsedLog} />
-        <p className="text-sm text-gray-400">Found in: <strong>%userprofile%\Saved Games\Frontier Developments\Elite Dangerous</strong> <CopyPathButton path="%userprofile%\Saved Games\Frontier Developments\Elite Dangerous" /></p>
-
-        <p className={`text-red-500 text-sm transition-opacity duration-300 ${file && !parsedLog ? "visible opacity-100" : "invisible opacity-0"}`}>Invalid file. Please upload a valid .log file containing the "Materials" event.</p>
+        <FileUpload file={file} setFile={setFile} parsedData={parsedLog} setParsedData={setParsedLog} setLogErrorMessage={setLogErrorMessage} />
 
 
-
+        <ErrorMessage message={logErrorMessage} />
 
         <label htmlFor="retrofit-report-textarea" className="text-lg">EDSY Retrofit Report </label>
 
         <InfoBox content=
-        
+
           {<><p>
             Use the following settings when generating the report: <br />
             Apply blueprints up to <strong>grade 5</strong> <strong>100%</strong> <br />
             Rolls to complete each grade <strong>1 2 3 4 5</strong> <span className="text-xs text-gray-700">(Assuming max reputation)</span>
-            
+
           </p>
 
-          <RetrofitReportHelpButton /></>
+            <RetrofitReportHelpButton /></>
           } />
         <textarea id="retrofit-report-textarea" className="bg-gray-700 p-1 w-full h-40 rounded-md resize-none placeholder-gray-400"
           placeholder="paste report here"
           onChange={(e) => setRetrofitReport(e.target.value)
           } />
-
-        <p className={`text-red-500 text-sm transition-opacity duration-300 my-2 ${retrofitReport && !parsedReport ? "visible opacity-100" : "invisible opacity-0"}`}>Invalid retrofit report format</p>
+        <ErrorMessage message={reportErrorMessage} />
 
         <div className={`center h-6 w-full mx-auto ${statusColor()}`}>
           <p className="text-white text-sm text-center"> {statusText()}</p>

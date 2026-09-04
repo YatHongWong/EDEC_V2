@@ -10,11 +10,23 @@ type FileUploadProps = {
     setFile: React.Dispatch<React.SetStateAction<File | null>>;
     parsedData: ParsedLogMaterials | null;
     setParsedData: React.Dispatch<React.SetStateAction<ParsedLogMaterials | null>>;
+    setLogErrorMessage: React.Dispatch<React.SetStateAction<string>>;
 };
 
 export default function FileUpload(props: FileUploadProps) {
 
     const [showHiddenInput, setShowHiddenInput] = useState(false);
+
+    async function handleFile(file: File) {
+        props.setFile(file);
+        const parseResult = await parseLog(file);
+        if (parseResult.success) {
+            props.setParsedData(parseResult.data);
+        } else {
+            props.setParsedData(null);
+        }
+        props.setLogErrorMessage(parseResult.message);
+    }
 
     async function handleFileDrop(e: React.DragEvent<HTMLDivElement>) {
         e.preventDefault();
@@ -24,10 +36,8 @@ export default function FileUpload(props: FileUploadProps) {
         if (!droppedFile) {
             return;
         }
+        await handleFile(droppedFile);
 
-        props.setFile(droppedFile);
-        const parsedData = await parseLog(droppedFile);
-        props.setParsedData(parsedData);
         setShowHiddenInput(false);
     }
 
@@ -38,9 +48,7 @@ export default function FileUpload(props: FileUploadProps) {
             return;
         }
 
-        props.setFile(selectedFile);
-        const parsedData = await parseLog(selectedFile);
-        props.setParsedData(parsedData);
+        await handleFile(selectedFile);
     }
 
     function showHiddenFileInput(e: React.DragEvent<HTMLDivElement>) {
@@ -52,7 +60,7 @@ export default function FileUpload(props: FileUploadProps) {
     return (
         <div className="relative" onDragOver={showHiddenFileInput} onDragLeave={() => setShowHiddenInput(false)}>
 
-            <div className="group hover:bg-gray-800 flex flex-col w-48 h-24 bg-white mb-2 rounded-md"
+            <div className="group hover:bg-gray-800 flex flex-col w-48 h-24 bg-white rounded-md"
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={handleFileDrop}
             >
@@ -65,13 +73,9 @@ export default function FileUpload(props: FileUploadProps) {
                 </label>
                 <input id="file-input" type="file" className="hidden"
                     onChange={handleFileSelect} />
-
             </div>
-
-
-
             <div className={`flex items-center justify-center fixed top-0 left-0 w-full h-full z-50 bg-gray-200/30 transition-opacity duration-300 ${showHiddenInput ? "opacity-100 backdrop-blur-md pointer-events-auto" : "opacity-0 pointer-events-none"}`} onDrop={handleFileDrop}>
-                    <h1 className="text-3xl font-thin text-center"> Upload File </h1>
+                <h1 className="text-3xl font-thin text-center"> Upload File </h1>
             </div>
 
 

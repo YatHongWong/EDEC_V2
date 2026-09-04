@@ -7,7 +7,7 @@ export function calculateResult(ownedMaterials: ParsedLogMaterials, requiredMate
     for (const [material, requiredQuantity] of Object.entries(requiredMaterials)) {
         const ownedCount: number = flattenedOwnedMaterials[material] ?? 0;
         if (ownedCount < requiredQuantity) {
-            missingMaterials[material] = requiredQuantity - ownedCount;
+            missingMaterials[material] = Math.ceil(requiredQuantity - ownedCount);
         }
     }
 
